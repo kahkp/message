@@ -1,5 +1,5 @@
 module.exports = function (app) {
- // var Usuario = app.models.usuario;
+  //var usuarios = app.models.usuario;
  
   var HomeController = {
     index: function (req, res) {
