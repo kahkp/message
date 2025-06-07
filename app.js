@@ -27,6 +27,7 @@ app.use(expressSession({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 
 load('models')
@@ -38,3 +39,4 @@ app.listen(3000, function () {
   console.log("Ntalk no ar.");
 });
 
+//pagina 69 - 70
