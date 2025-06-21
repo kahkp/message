@@ -10,7 +10,10 @@ var express = require ('express')
   , cookie = cookieParser(SECRET)
   , app = express();
 
-
+var express = require('express')
+, app = express()
+, load = require('express-load')
+, error = require('./middleware/error');
 
 
 
@@ -27,16 +30,28 @@ app.use(expressSession({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.use(app.router);
 app.use(express.static(__dirname + '/public'));
+app.use(error.notFound);
+app.use(error.serverError);
+
+
 
 load('models')
   .then('controllers')
   .then('routes')
   .into(app);
 
+  app.use(function(req, res, next) {
+res.status(404);
+res.render('not-found');
+});
+app.use(function(error, req, res, next) {
+res.status(500);
+res.render('server-error', error);
+});
+
 app.listen(3000, function () {
   console.log("Ntalk no ar.");
 });
 
-//pagina 69 - 70
+//pagina 74
