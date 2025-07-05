@@ -10,10 +10,12 @@ var express = require ('express')
   , cookie = cookieParser(SECRET)
   , app = express();
 
-var express = require('express')
-, app = express()
-, load = require('express-load')
-, error = require('./middleware/error');
+var error = require('./middleware/error')
+, http = require('http')
+, server = http.createServer(app)
+, { Server } = require ("socket.io")
+, io = new Server(server);
+
 
 
 
@@ -31,18 +33,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(__dirname + '/public'));
-app.use(error.notFound);
-app.use(error.serverError);
 
 
 
 load('models')
-  .then('controllers')
-  .then('routes')
-  .into(app);
+.then('controllers')
+.then('routes')
+.into(app);
+app.use(error.notFound);
+app.use(error.serverError);
 
-  app.use(function(req, res, next) {
-res.status(404);
+app.use(function(req, res, next) {
+  res.status(404);
 res.render('not-found');
 });
 app.use(function(error, req, res, next) {
@@ -50,8 +52,15 @@ res.status(500);
 res.render('server-error', error);
 });
 
-app.listen(3000, function () {
-  console.log("Ntalk no ar.");
+io.on('connection', function (client) {
+client.on('send-server', function (data) {
+var msg = "<b>"+data.nome+":</b> "+data.msg+"<br>";
+client.emit('send-client', msg);
+client.broadcast.emit('send-client', msg);
+});
+});
+server.listen(3000, function(){
+console.log("Ntalk no ar.");
 });
 
-//pagina 74
+//pagina 80 (ver o que esta de errado nessa parte aqui... pra poder conseguir rodar.)
